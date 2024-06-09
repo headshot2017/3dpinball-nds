@@ -147,6 +147,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 
 			// Table
 			bgSetScroll(ndsfb_graphics::getBgMain(), -52-render::get_offset_x(), -render::get_offset_y());
+			bgUpdate();
 			for (int y = 0; y < 192; y++)
 			{
 				for (int x = 3; x < 160; x++)
