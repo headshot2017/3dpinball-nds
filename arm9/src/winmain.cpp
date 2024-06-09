@@ -146,20 +146,18 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			// Copy game screen buffer to texture
 
 			// Table
+			bgSetScroll(ndsfb_graphics::getBgMain(), -52-render::get_offset_x(), -render::get_offset_y());
 			for (int y = 0; y < 192; y++)
 			{
-				for (int x = 3; x < 256; x++)
+				for (int x = 3; x < 160; x++)
 				{
 					int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
 					int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
 
 					Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
 
-					if (x < 160)
-					{
-						u16* vram_ptr = bgGetGfxPtr(ndsfb_graphics::getBgMain());
-						vram_ptr[y * 256 + x] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
-					}
+					u16* vram_ptr = bgGetGfxPtr(ndsfb_graphics::getBgMain());
+					vram_ptr[y * 256 + (x-3)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
 				}
 			}
 
