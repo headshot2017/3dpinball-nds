@@ -170,7 +170,7 @@ int loader::get_sound_id(int groupIndex)
 				sound_list[soundIndex].Duration = static_cast<float>(sampleCount / wavHeader.sample_rate);
 				sound_list[soundIndex].DurationSamples = wavHeader.data_size;
 				sound_list[soundIndex].SampleRate = wavHeader.sample_rate;
-				sound_list[soundIndex].WavePtr = (sound_list[soundIndex].Duration < 1.5f) ? Sound::LoadWaveFile(filePath) : 0;
+				sound_list[soundIndex].WavePtr = (sound_list[soundIndex].Duration < 2.f) ? Sound::LoadWaveFile(filePath) : 0;
 				//sound_list[soundIndex].WavePtr = 0;
 			}
 		}
