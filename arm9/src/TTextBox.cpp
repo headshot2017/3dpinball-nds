@@ -105,6 +105,9 @@ void TTextBox::Display(const char* text, float time)
 	if (!text)
 		return;
 
+	printf("\x1b[2J");
+	printf("\x1b[1;1H%s\n", text);
+
 	if (Message1 && !strcmp(text, Message2->Text))
 	{
 		Message2->Refresh(time);
