@@ -9,6 +9,7 @@
 #include "winmain.h"
 
 std::vector<render_sprite_type_struct*> render::dirty_list, render::sprite_list, render::ball_list;
+std::vector<rectangle_type> render::dirty_balls;
 zmap_header_type* render::background_zmap;
 int render::zmap_offset, render::zmap_offsetY, render::offset_x, render::offset_y;
 float render::zscaler, render::zmin, render::zmax;
@@ -59,6 +60,8 @@ void render::uninit()
 
 void render::update()
 {
+	dirty_balls.clear();
+
 	unpaint_balls();
 
 	// Clip dirty sprites with vScreen, clear clipping (dirty) rectangles 
@@ -327,6 +330,7 @@ void render::paint_balls()
 	{
 		auto ball = ball_list[index];
 		auto dirty = &ball->DirtyRect;
+		auto dirtyPrev = &ball->DirtyRectPrev;
 		if (ball->Bmp && maths::rectangle_clip(&ball->BmpRect, &vscreen_rect, &ball->DirtyRect))
 		{
 			int xPos = dirty->XPosition;
@@ -345,6 +349,13 @@ void render::paint_balls()
 				xPos - ball->BmpRect.XPosition,
 				yPos - ball->BmpRect.YPosition,
 				ball->Depth);
+
+			dirty_balls.push_back({
+				xPos,
+				yPos,
+				dirty->Width,
+				dirty->Height,
+			});
 		}
 		else
 		{
@@ -360,6 +371,7 @@ void render::unpaint_balls()
 	{
 		auto curBall = ball_list[index];
 		if (curBall->DirtyRect.Width > 0)
+		{
 			gdrv::copy_bitmap(
 				vscreen,
 				curBall->DirtyRect.Width,
@@ -369,6 +381,14 @@ void render::unpaint_balls()
 				ball_bitmap[index],
 				0,
 				0);
+
+			dirty_balls.push_back({
+				curBall->DirtyRectPrev.XPosition,
+				curBall->DirtyRectPrev.YPosition,
+				curBall->DirtyRectPrev.Width,
+				curBall->DirtyRectPrev.Height,
+			});
+		}
 
 		curBall->DirtyRectPrev = curBall->DirtyRect;
 	}
