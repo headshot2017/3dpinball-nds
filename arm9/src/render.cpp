@@ -9,7 +9,7 @@
 #include "winmain.h"
 
 std::vector<render_sprite_type_struct*> render::dirty_list, render::sprite_list, render::ball_list;
-std::vector<rectangle_type> render::dirty_balls;
+std::vector<rectangle_type> render::dirty_regions;
 zmap_header_type* render::background_zmap;
 int render::zmap_offset, render::zmap_offsetY, render::offset_x, render::offset_y;
 float render::zscaler, render::zmin, render::zmax;
@@ -60,7 +60,7 @@ void render::uninit()
 
 void render::update()
 {
-	dirty_balls.clear();
+	dirty_regions.clear();
 
 	unpaint_balls();
 
@@ -99,6 +99,13 @@ void render::update()
 				gdrv::copy_bitmap(vscreen, width, height, xPos, yPos, background_bitmap, xPos, yPos);
 			else
 				gdrv::fill_bitmap(vscreen, width, height, xPos, yPos, 0);
+
+			dirty_regions.push_back({
+				xPos,
+				yPos,
+				width,
+				height
+			});
 		}
 	}
 
@@ -350,7 +357,7 @@ void render::paint_balls()
 				yPos - ball->BmpRect.YPosition,
 				ball->Depth);
 
-			dirty_balls.push_back({
+			dirty_regions.push_back({
 				xPos,
 				yPos,
 				dirty->Width,
@@ -382,7 +389,7 @@ void render::unpaint_balls()
 				0,
 				0);
 
-			dirty_balls.push_back({
+			dirty_regions.push_back({
 				curBall->DirtyRectPrev.XPosition,
 				curBall->DirtyRectPrev.YPosition,
 				curBall->DirtyRectPrev.Width,

@@ -36,7 +36,17 @@ double winmain::UpdateToFrameRatio;
 winmain::DurationMs winmain::TargetFrameTime;
 optionsStruct &winmain::Options = options::Options;
 
-static bool texLoaded = false;
+static int floorf32(int x)
+{
+	return inttof32(f32toint(x));
+}
+
+static int ceilf32(int x)
+{
+	int floored = floorf32(x);
+	return (floored != x) ? floored+inttof32(1) : x;
+}
+
 
 int winmain::WinMain(LPCSTR lpCmdLine)
 {
@@ -129,8 +139,6 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 
 	bQuit = false;
 
-	texLoaded = true;
-
 	while (!bQuit)
 	{
 		// Input
@@ -158,16 +166,16 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			// Copy game screen buffer to texture
 
 			// Table
-			for (u32 i=0; i<render::get_dirty_balls().size(); i++)
+			for (u32 i=0; i<render::get_dirty_regions().size(); i++)
 			{
-				rectangle_type dirty = render::get_dirty_balls()[i];
+				rectangle_type dirty = render::get_dirty_regions()[i];
 
 				for (int y = dirty.YPosition; y < dirty.YPosition+dirty.Height; y++)
 				{
 					for (int x = dirty.XPosition; x < dirty.XPosition+dirty.Width; x++)
 					{
-						int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width) ), inttof32(256) ) );
-						int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(192) ) );
+						int smallX = f32toint( ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width) ), inttof32(256) ) ) );
+						int smallY = f32toint( ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(192) ) ) );
 
 						Rgba color = render::vscreen->BmpBufPtr1[y * render::vscreen->Width + x].rgba;
 						VRAM_A[smallY * 256 + (smallX+49)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
