@@ -29,7 +29,7 @@ std::map<uint32_t, LPCSTR> rc_strings
 	{21, "Skill Shot\n%ld"},
 	{22, "Game Paused\nStart to Resume"},
 	{23, "Continue Play"},
-	{24, "Select Starts New Game"},
+	{24, "SELECT Starts New Game"},
 	{25, "Careful..."},
 	{26, "Player 1"},
 	{27, "Player 2"},
