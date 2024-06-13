@@ -60,8 +60,6 @@ void render::uninit()
 
 void render::update()
 {
-	dirty_regions.clear();
-
 	unpaint_balls();
 
 	// Clip dirty sprites with vScreen, clear clipping (dirty) rectangles 
@@ -337,7 +335,6 @@ void render::paint_balls()
 	{
 		auto ball = ball_list[index];
 		auto dirty = &ball->DirtyRect;
-		auto dirtyPrev = &ball->DirtyRectPrev;
 		if (ball->Bmp && maths::rectangle_clip(&ball->BmpRect, &vscreen_rect, &ball->DirtyRect))
 		{
 			int xPos = dirty->XPosition;

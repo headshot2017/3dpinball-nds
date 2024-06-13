@@ -106,6 +106,7 @@ void score::erase(scoreStruct* score, int blitFlag)
 				score->OffsetY);
 		else
 			gdrv::fill_bitmap(render::vscreen, score->Width, score->Height, score->OffsetX, score->OffsetY, 0);
+		render::get_dirty_regions().push_back({score->OffsetX, score->OffsetY, score->Width, score->Height});
 	}
 }
 
@@ -143,6 +144,7 @@ void score::update(scoreStruct* score)
 					gdrv::copy_bitmap_w_transparency(render::vscreen, width, height, x, y, bmp, 0, 0);
 				else
 					gdrv::copy_bitmap(render::vscreen, width, height, x, y, bmp, 0, 0);
+				render::get_dirty_regions().push_back({x, y, width, height});
 			}
 		}
 	}

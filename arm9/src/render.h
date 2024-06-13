@@ -51,7 +51,7 @@ public:
 	static int get_offset_y();
 	static void build_occlude_list();
 
-	static const std::vector<rectangle_type>& get_dirty_regions() {return dirty_regions;}
+	static std::vector<rectangle_type>& get_dirty_regions() {return dirty_regions;}
 private:
 	static std::vector<render_sprite_type_struct*> dirty_list, sprite_list, ball_list;
 	static std::vector<rectangle_type> dirty_regions;

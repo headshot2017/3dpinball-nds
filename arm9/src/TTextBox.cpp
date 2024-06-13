@@ -85,6 +85,8 @@ void TTextBox::Clear()
 			OffsetY);
 	else
 		gdrv::fill_bitmap(render::vscreen, Width, Height, OffsetX, OffsetY, 0);	
+	render::get_dirty_regions().push_back({OffsetX, OffsetY, Width, Height});
+
 	if (Timer)
 	{
 		if (Timer != -1)
@@ -105,8 +107,8 @@ void TTextBox::Display(const char* text, float time)
 	if (!text)
 		return;
 
-	printf("\x1b[2J");
-	printf("\x1b[1;1H%s\n", text);
+	//printf("\x1b[2J");
+	//printf("\x1b[1;1H%s\n", text);
 
 	if (Message1 && !strcmp(text, Message2->Text))
 	{
@@ -162,6 +164,7 @@ void TTextBox::Draw()
 			OffsetY);
 	else
 		gdrv::fill_bitmap(render::vscreen, Width, Height, OffsetX, OffsetY, 0);
+	render::get_dirty_regions().push_back({OffsetX, OffsetY, Width, Height});
 
 	bool display = false;
 	while (Message1)
@@ -252,6 +255,8 @@ void TTextBox::Draw()
 						                                 0);
 					else
 						gdrv::copy_bitmap(render::vscreen, width, height, offX, y, charBmp, 0, 0);
+					render::get_dirty_regions().push_back({offX, y, width, height});
+
 					font = Font;
 					offX += charBmp->Width + font->GapWidth;
 				}

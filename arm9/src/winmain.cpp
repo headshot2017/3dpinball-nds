@@ -55,6 +55,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	// Initialize graphics and input
 
 	ndsfb_graphics::Initialize();
+	ndsfb_graphics::InitializeConsole();
 	nds_input::Initialize();
 
 	if (!fatInitDefault())
@@ -123,17 +124,36 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	pb::firsttime_setup();
 	pb::replay_level(0);
 
+	// Table bitmap
 	for (int y = 0; y < 192; y++)
 	{
-		for (int x = 3; x < 160; x++)
+		//for (int x = 3; x < 160; x++)
+		for (int x = 0; x < 256; x++)
 		{
 			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
 			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
 
 			Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
-			VRAM_A[y * 256 + (x+49)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
+			//VRAM_A[y * 256 + (x+49)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
+			VRAM_A[y * 256 + x] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
 		}
 	}
+
+	// Info bitmap
+	/*
+	u16* vram_ptr = bgGetGfxPtr(ndsfb_graphics::getBgSub());
+	for (int y = 0; y < 192; y++)
+	{
+		for (int x = 160; x < 256; x++)
+		{
+			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
+			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
+
+			Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
+			vram_ptr[y * 256 + (x)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
+		}
+	}
+	*/
 
 	// Begin main loop
 
@@ -178,10 +198,11 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 						int smallY = f32toint( ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(192) ) ) );
 
 						Rgba color = render::vscreen->BmpBufPtr1[y * render::vscreen->Width + x].rgba;
-						VRAM_A[smallY * 256 + (smallX+49)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
+						VRAM_A[smallY * 256 + (smallX)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
 					}
 				}
 			}
+			render::get_dirty_regions().clear();
 
 			// Side info
 			/*
@@ -240,10 +261,6 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	midi::music_shutdown();
 	pb::uninit();
 	Sound::Close();
-
-	//free(boardDisplayList);
-	//free(sidebarDisplayList);
-	//free(textureData);
 
 	printf("Finished uninitializing.\n");
 
