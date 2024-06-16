@@ -4,8 +4,8 @@
 
 class ndsfb_graphics
 {
-private:
     static bool isConsoleInitialized;
+	static bool rotated;
 	static int bgMainID;
 	static int bgSubID;
 
@@ -13,8 +13,15 @@ public:
     static void Initialize();
     static void SwapBuffers();
 
-    static void InitializeConsole();
+	static void AskRotationMode();
+	static bool isRotated() {return rotated;}
 
-	static int getBgMain() {return bgMainID;}
-	static int getBgSub() {return bgSubID;}
+	static void UpdateFull(bool sub=true);
+	static void Update();
+
+    static void SetSubScreenConsole(bool on);
+
+private:
+	static void UpdateNormalMode();
+	static void UpdateRotatedMode();
 };

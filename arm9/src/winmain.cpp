@@ -36,17 +36,6 @@ double winmain::UpdateToFrameRatio;
 winmain::DurationMs winmain::TargetFrameTime;
 optionsStruct &winmain::Options = options::Options;
 
-static int floorf32(int x)
-{
-	return inttof32(f32toint(x));
-}
-
-static int ceilf32(int x)
-{
-	int floored = floorf32(x);
-	return (floored != x) ? floored+inttof32(1) : x;
-}
-
 
 int winmain::WinMain(LPCSTR lpCmdLine)
 {
@@ -55,8 +44,6 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	// Initialize graphics and input
 
 	ndsfb_graphics::Initialize();
-	ndsfb_graphics::InitializeConsole();
-	nds_input::Initialize();
 
 	if (!fatInitDefault())
 		PrintFatalError("fatInitDefault() failed\nPlease check your SD card.\n");
@@ -124,36 +111,13 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	pb::firsttime_setup();
 	pb::replay_level(0);
 
-	// Table bitmap
-	for (int y = 0; y < 192; y++)
-	{
-		//for (int x = 3; x < 160; x++)
-		for (int x = 0; x < 256; x++)
-		{
-			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
-			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
+	ndsfb_graphics::AskRotationMode();
+	ndsfb_graphics::SetSubScreenConsole(false);
 
-			Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
-			//VRAM_A[y * 256 + (x+49)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
-			VRAM_A[y * 256 + x] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
-		}
-	}
+	ndsfb_graphics::UpdateFull();
 
-	// Info bitmap
-	/*
-	u16* vram_ptr = bgGetGfxPtr(ndsfb_graphics::getBgSub());
-	for (int y = 0; y < 192; y++)
-	{
-		for (int x = 160; x < 256; x++)
-		{
-			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
-			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
-
-			Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
-			vram_ptr[y * 256 + (x)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
-		}
-	}
-	*/
+	nds_input::Initialize();
+	nds_input::ScanPads();
 
 	// Begin main loop
 
@@ -184,41 +148,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			pb::frame(1000.0f / 60.0f);
 
 			// Copy game screen buffer to texture
-
-			// Table
-			for (u32 i=0; i<render::get_dirty_regions().size(); i++)
-			{
-				rectangle_type dirty = render::get_dirty_regions()[i];
-
-				for (int y = dirty.YPosition; y < dirty.YPosition+dirty.Height; y++)
-				{
-					for (int x = dirty.XPosition; x < dirty.XPosition+dirty.Width; x++)
-					{
-						int smallX = f32toint( ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width) ), inttof32(256) ) ) );
-						int smallY = f32toint( ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(192) ) ) );
-
-						Rgba color = render::vscreen->BmpBufPtr1[y * render::vscreen->Width + x].rgba;
-						VRAM_A[smallY * 256 + (smallX)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
-					}
-				}
-			}
-			render::get_dirty_regions().clear();
-
-			// Side info
-			/*
-			for (int y = 0; y < 192; y++)
-			{
-				for (int x = 160; x < 256; x++)
-				{
-					int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
-					int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
-
-					Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
-					u16* vram_ptr = bgGetGfxPtr(ndsfb_graphics::getBgSub());
-					vram_ptr[y * 256 + (x-160)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
-				}
-			}
-			*/
+			ndsfb_graphics::Update();
 
 			/*
 			printf("%d %d %d %d\n", vramWidth, vramHeight, texWidth, texHeight);
@@ -252,6 +182,8 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 
 		ndsfb_graphics::SwapBuffers();
 	}
+
+	ndsfb_graphics::SetSubScreenConsole(true);
 
 	printf("Uninitializing...\n");
 
@@ -308,7 +240,7 @@ void winmain::UpdateFrameRate()
 
 void winmain::PrintFatalError(const char *message, ...)
 {
-	ndsfb_graphics::InitializeConsole();
+	ndsfb_graphics::SetSubScreenConsole(true);
 
 	va_list args;
 	va_start(args, message);
@@ -324,7 +256,7 @@ void winmain::PrintFatalError(const char *message, ...)
 		if (nds_input::SkipError())
 			break;
 
-		swiWaitForVBlank();
+		ndsfb_graphics::SwapBuffers();
 	}
 
 	exit(EXIT_FAILURE);
