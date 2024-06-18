@@ -25,7 +25,7 @@ DEFINES		?= -DARM9 -D__NDS__
 # Libraries
 # ---------
 
-LIBS		?= -lnds9 -lz
+LIBS		?= -lnds9
 LIBDIRS		+= $(BLOCKSDS)/libs/libnds
 
 # Build artifacts
