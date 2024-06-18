@@ -1,0 +1,24 @@
+name: NDS
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: NDS build
+    runs-on: ubuntu-latest
+    container: 
+      image: skylyrac/blocksds:dev-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Make
+      run: |
+        make
+        
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: NDS ROM
+        path: ./3dpinball-nds.nds
