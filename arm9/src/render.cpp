@@ -33,7 +33,7 @@ void render::init(gdrv_bitmap8* bmp, float zMin, float zScaler, int width, int h
 	vscreen->XPosition = 0;
 	for (auto& ballBmp : ball_bitmap)
 	{
-		ballBmp = new gdrv_bitmap8(64, 64, false);
+		ballBmp = new gdrv_bitmap8(32, 32, false);
 	}
 
 	background_bitmap = bmp;
@@ -391,6 +391,12 @@ void render::unpaint_balls()
 				curBall->DirtyRectPrev.YPosition,
 				curBall->DirtyRectPrev.Width,
 				curBall->DirtyRectPrev.Height,
+			});
+			dirty_regions.push_back({
+				curBall->DirtyRect.XPosition,
+				curBall->DirtyRect.YPosition,
+				curBall->DirtyRect.Width,
+				curBall->DirtyRect.Height,
 			});
 		}
 

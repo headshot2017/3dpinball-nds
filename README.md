@@ -1,11 +1,12 @@
-# 3D Pinball - Space Cadet for DS(i)
+# 3D Pinball - Space Cadet for DS
 
-Port of 3D Pinball - Space Cadet to the Nintendo DS(i), based on the [decompilation project](https://github.com/k4zmu2a/SpaceCadetPinball)
+Port of 3D Pinball - Space Cadet to the Nintendo DS, based on the [decompilation project](https://github.com/k4zmu2a/SpaceCadetPinball)
 
-![image](screenshot.png)
+![image](screenshot1.png)
+![image](screenshot2.png)
+![image](screenshot3.png)
 
 Built with the [BlocksDS SDK](https://github.com/blocksds/sdk)
 
 This port has some bugs which are currently being fixed:
-* Does not run on original DS due to running out of memory while loading. It can only run in DSi mode
-* Can't load all sound files due to running out of memory
+* Sprites on the pinball table do not appear correctly due to being downscaled by half

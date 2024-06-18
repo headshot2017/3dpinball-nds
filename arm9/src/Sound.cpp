@@ -1,5 +1,7 @@
 #include "pch.h"
+#include "loader.h"
 #include "Sound.h"
+#include "winmain.h"
 
 #define DR_WAV_IMPLEMENTATION
 #include <dr_wav.h>
@@ -48,14 +50,12 @@ void Sound::PlaySound(s16* wavePtr, int time, int size, int samplerate)
 	}
 }
 
-s16* Sound::LoadWaveFile(const std::string& lpName)
+s16* Sound::LoadWaveFile(const std::string& lpName, int* outSize, int* outSampleRate, int* outChannels)
 {
 	drwav wavfp;
 
 	if (!drwav_init_file(&wavfp, lpName.c_str(), NULL))
-	{
 		return 0;
-	}
 
 	s16* pSampleData = new s16[(u32)wavfp.totalPCMFrameCount * wavfp.channels];
 	if (pSampleData == 0)
@@ -63,6 +63,7 @@ s16* Sound::LoadWaveFile(const std::string& lpName)
 		drwav_uninit(&wavfp);
 		return 0;
 	}
+
 	u32 totalRead = drwav_read_pcm_frames(&wavfp, wavfp.totalPCMFrameCount, pSampleData);
 	if (!totalRead)
 	{
@@ -79,6 +80,10 @@ s16* Sound::LoadWaveFile(const std::string& lpName)
 		pSampleData = _8bitdata;
 	}
 
+	*outSize = wavfp.totalPCMFrameCount * wavfp.channels;
+	*outSampleRate = wavfp.sampleRate;
+	*outChannels = wavfp.channels;
+	drwav_uninit(&wavfp);
 	return pSampleData;
 
 }

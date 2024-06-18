@@ -81,8 +81,8 @@ void TBall::Repaint()
 		RenderSprite,
 		bmp,
 		zDepth,
-		pos2D[0] - bmp->Width / 2,
-		pos2D[1] - bmp->Height / 2);
+		pos2D[0]/2 - bmp->Width / 2,
+		pos2D[1]/2 - bmp->Height / 2);
 }
 
 void TBall::not_again(TEdgeSegment* edge)

@@ -101,9 +101,9 @@ void gdrv_bitmap8::ScaleIndexed(float scaleX, float scaleY)
 	Stride = IndexedStride = Width = newWidht;
 	Height = newHeight;
 
-	delete IndexedBmpPtr;
+	delete[] IndexedBmpPtr;
 	IndexedBmpPtr = newIndBuf;
-	delete BmpBufPtr1;
+	delete[] BmpBufPtr1;
 	BmpBufPtr1 = new ColorRgba[Stride * Height];
 }
 

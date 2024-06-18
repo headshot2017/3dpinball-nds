@@ -9,7 +9,7 @@ public:
 	static void Deactivate();
 	static void Close();
 	static void PlaySound(s16* wavePtr, int time, int size, int samplerate);
-	static s16* LoadWaveFile(const std::string& lpName);
+	static s16* LoadWaveFile(const std::string& lpName, int* outSize, int* outSampleRate, int* outChannels);
 	static void FreeSound(s16* wave);
 	static void SetChannels(int channels);
 private:

@@ -109,15 +109,15 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 
 	pb::reset_table();
 	pb::firsttime_setup();
-	pb::replay_level(0);
 
 	ndsfb_graphics::AskRotationMode();
 	ndsfb_graphics::SetSubScreenConsole(false);
-
 	ndsfb_graphics::UpdateFull();
 
 	nds_input::Initialize();
 	nds_input::ScanPads();
+
+	pb::replay_level(0);
 
 	// Begin main loop
 

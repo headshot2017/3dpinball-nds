@@ -129,6 +129,17 @@ DatFile* partman::load_records(LPCSTR lpFileName, bool fullTiltMode)
 	fclose(fileHandle);
 	if (datFile->Groups.size() == header.NumberOfGroups)
 	{
+		for (auto groupData : datFile->Groups)
+		{
+			for (auto entryData : groupData->GetEntries())
+			{
+				if (entryData->EntryType != FieldTypes::Bitmap8bit) continue;
+				gdrv_bitmap8* bmp = reinterpret_cast<gdrv_bitmap8*>(entryData->Buffer);
+				bmp->ScaleIndexed(0.5f, 0.5f);
+				bmp->XPosition /= 2;
+				bmp->YPosition /= 2;
+			}
+		}
 		datFile->Finalize();
 		return datFile;
 	}

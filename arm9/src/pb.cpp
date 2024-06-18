@@ -69,15 +69,15 @@ int pb::init()
 		memcpy(&projMat, cameraInfo, sizeof(float) * 4 * 3);
 		cameraInfo += 12;
 
-		auto projCenterX = resInfo->TableWidth * 0.5f;
-		auto projCenterY = resInfo->TableHeight * 0.5f;
+		auto projCenterX = resInfo->TableWidth * 0.25f;
+		auto projCenterY = resInfo->TableHeight * 0.25f;
 		auto projD = cameraInfo[0];
 		proj::init(projMat, projD, projCenterX, projCenterY);
 		zMin = cameraInfo[1];
 		zScaler = cameraInfo[2];
 	}
 
-	render::init(nullptr, zMin, zScaler, resInfo->TableWidth, resInfo->TableHeight);
+	render::init(nullptr, zMin, zScaler, resInfo->TableWidth*0.5f, resInfo->TableHeight*0.5f);
 	gdrv::copy_bitmap(
 		render::vscreen,
 		backgroundBmp->Width,

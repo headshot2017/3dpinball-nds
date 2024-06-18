@@ -85,8 +85,8 @@ public:
 	GroupData(int groupId);
 	void AddEntry(EntryData* entry);
 	void FinalizeGroup();
-	const std::vector<EntryData*>& GetEntries() const { return Entries; }
-	const EntryData* GetEntry(size_t index) const { return Entries[index]; }
+	std::vector<EntryData*>& GetEntries() { return Entries; }
+	EntryData* GetEntry(size_t index) { return Entries[index]; }
 	size_t EntryCount() const { return Entries.size(); }
 	void ReserveEntries(size_t count) { Entries.reserve(count); }
 	gdrv_bitmap8* GetBitmap(int resolution) const;

@@ -120,7 +120,7 @@ void ndsfb_graphics::UpdateFull(bool sub)
 	{
 		for (int x = 0; x < 360; x++)
 		{
-			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(360) ) );
+			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(360/2) ) );
 			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(224) ), inttof32(render::vscreen->Height) ) );
 
 			Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
@@ -136,7 +136,7 @@ void ndsfb_graphics::UpdateFull(bool sub)
 	{
 		for (int x = 328; x < 328+192; x++)
 		{
-			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(render::vscreen->Width-380) ) );
+			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(render::vscreen->Width-380/2) ) );
 			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(256) ), inttof32(render::vscreen->Height) ) );
 			u16* vram_ptr = bgGetGfxPtr(bgSubID);
 
@@ -205,17 +205,17 @@ void ndsfb_graphics::UpdateRotatedMode()
 			for (int x = dirty.XPosition; x < dirty.XPosition+dirty.Width; x++)
 			{
 				int smallX, smallY, ind;
-				u16* vram_ptr = (dirty.XPosition < 370) ? VRAM_A : bgGetGfxPtr(bgSubID);
+				u16* vram_ptr = (dirty.XPosition < 370/2) ? VRAM_A : bgGetGfxPtr(bgSubID);
 
 				if (vram_ptr == VRAM_A)
 				{
-					smallX = f32toint( ceilf32(mulf32( divf32( inttof32(x), inttof32(360) ), inttof32(192) ) ) );
+					smallX = f32toint( ceilf32(mulf32( divf32( inttof32(x), inttof32(360/2) ), inttof32(192) ) ) );
 					smallY = f32toint( ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(224) ) ) );
 					ind = tableStartPos + ((smallX-3) * 256 + (256-1-smallY));
 				}
 				else
 				{
-					smallX = f32toint( ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width-380) ), inttof32(192) ) ) );
+					smallX = f32toint( ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width-380/2) ), inttof32(192) ) ) );
 					smallY = f32toint( ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(256) ) ) );
 					ind = (smallX-328) * 256 + (256-1-smallY);
 				}

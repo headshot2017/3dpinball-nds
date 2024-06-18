@@ -33,10 +33,10 @@ scoreStruct* score::create(LPCSTR fieldName, gdrv_bitmap8* renderBgBmp)
 		return nullptr;
 	}
 	int groupIndex = *dimensions++;
-	score->OffsetX = *dimensions++;
-	score->OffsetY = *dimensions++;
-	score->Width = *dimensions++;
-	score->Height = *dimensions;
+	score->OffsetX = *dimensions++/2;
+	score->OffsetY = *dimensions++/2;
+	score->Width = *dimensions++/2;
+	score->Height = *dimensions/2;
 
 	for (int index = 0; index < 10; index++)
 	{
@@ -65,7 +65,7 @@ void score::load_msg_font(LPCSTR lpName)
 	// FT font has multiple resolutions
 	auto gapArray = reinterpret_cast<int16_t*>(pb::record_table->field(groupIndex, FieldTypes::ShortArray));
 	if (gapArray)
-		msg_fontp->GapWidth = gapArray[fullscrn::GetResolution()];
+		msg_fontp->GapWidth = gapArray[fullscrn::GetResolution()]/2;
 	else
 		msg_fontp->GapWidth = 0;
 
@@ -74,9 +74,12 @@ void score::load_msg_font(LPCSTR lpName)
 		auto bmp = pb::record_table->GetBitmap(groupIndex);
 		if (!bmp)
 			break;
+		msg_fontp->Chars[charIndex] = bmp;
+		bmp->ScaleIndexed(0.5f, 0.5f);
 		if (!msg_fontp->Height)
 			msg_fontp->Height = bmp->Height;
-		msg_fontp->Chars[charIndex] = bmp;
+		//bmp->XPosition /= 2;
+		//bmp->YPosition /= 2;
 	}
 }
 
