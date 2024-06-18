@@ -50,7 +50,7 @@ void Sound::PlaySound(s16* wavePtr, int time, int size, int samplerate)
 	}
 }
 
-s16* Sound::LoadWaveFile(const std::string& lpName, int* outSize, int* outSampleRate, int* outChannels)
+s16* Sound::LoadWaveFile(const std::string& lpName)
 {
 	drwav wavfp;
 
@@ -80,9 +80,6 @@ s16* Sound::LoadWaveFile(const std::string& lpName, int* outSize, int* outSample
 		pSampleData = _8bitdata;
 	}
 
-	*outSize = wavfp.totalPCMFrameCount * wavfp.channels;
-	*outSampleRate = wavfp.sampleRate;
-	*outChannels = wavfp.channels;
 	drwav_uninit(&wavfp);
 	return pSampleData;
 
