@@ -4,6 +4,7 @@
 #include "gdrv.h"
 #include "GroupData.h"
 #include "zdrv.h"
+#include "maths.h"
 
 short partman::_field_size[] =
 {
@@ -136,8 +137,8 @@ DatFile* partman::load_records(LPCSTR lpFileName, bool fullTiltMode)
 				if (entryData->EntryType != FieldTypes::Bitmap8bit) continue;
 				gdrv_bitmap8* bmp = reinterpret_cast<gdrv_bitmap8*>(entryData->Buffer);
 				bmp->ScaleIndexed(0.5f, 0.5f);
-				bmp->XPosition /= 2;
-				bmp->YPosition /= 2;
+				bmp->XPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->XPosition), inttof32(2) ) ) );
+				bmp->YPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->YPosition), inttof32(2) ) ) );
 			}
 		}
 		datFile->Finalize();

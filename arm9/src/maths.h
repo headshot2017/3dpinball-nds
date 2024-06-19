@@ -97,4 +97,7 @@ public:
 	static void RotateVector(vector_type* vec, float angle);
 	static void find_closest_edge(ramp_plane_type* plane, int planeCount, wall_point_type* wall, vector_type** lineEnd,
 	                              vector_type** lineStart);
+
+	static int floorf32(int x);
+	static int ceilf32(int x);
 };

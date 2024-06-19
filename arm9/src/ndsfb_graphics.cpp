@@ -1,5 +1,6 @@
 #include "ndsfb_graphics.h"
 #include "pch.h"
+#include "maths.h"
 #include "render.h"
 
 #include <cstdio>
@@ -7,17 +8,6 @@
 #include <malloc.h>
 
 static int tableStartPos = (0) * 256 + (256-1-16); // pinbal table start position for rotated screen mode
-
-static int floorf32(int x)
-{
-	return inttof32(f32toint(x));
-}
-
-static int ceilf32(int x)
-{
-	int floored = floorf32(x);
-	return (floored != x) ? floored+inttof32(1) : x;
-}
 
 
 bool ndsfb_graphics::isConsoleInitialized = false;
@@ -81,6 +71,7 @@ void ndsfb_graphics::AskRotationMode()
 			if (key & KEY_UP)
 			{
 				selection = (selection-1) % 2;
+				if (selection < 0) selection = -selection;
 				break;
 			}
 			if (key & KEY_A)
@@ -184,8 +175,8 @@ void ndsfb_graphics::UpdateNormalMode()
 		{
 			for (int x = dirty.XPosition; x < dirty.XPosition+dirty.Width; x++)
 			{
-				int smallX = f32toint( ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width) ), inttof32(256) ) ) );
-				int smallY = f32toint( ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(192) ) ) );
+				int smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width) ), inttof32(256) ) ) );
+				int smallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(192) ) ) );
 
 				Rgba color = render::vscreen->BmpBufPtr1[y * render::vscreen->Width + x].rgba;
 				VRAM_A[smallY * 256 + (smallX)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
@@ -204,24 +195,36 @@ void ndsfb_graphics::UpdateRotatedMode()
 		{
 			for (int x = dirty.XPosition; x < dirty.XPosition+dirty.Width; x++)
 			{
-				int smallX, smallY, ind;
+				int smallX, smallY, prevSmallX, prevSmallY, ind;
 				u16* vram_ptr = (dirty.XPosition < 370/2) ? VRAM_A : bgGetGfxPtr(bgSubID);
 
 				if (vram_ptr == VRAM_A)
 				{
-					smallX = f32toint( ceilf32(mulf32( divf32( inttof32(x), inttof32(360/2) ), inttof32(192) ) ) );
-					smallY = f32toint( ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(224) ) ) );
-					ind = tableStartPos + ((smallX-3) * 256 + (256-1-smallY));
+					smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(360/2) ), inttof32(192) ) ) );
+					smallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(224) ) ) );
+					prevSmallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x-1), inttof32(360/2) ), inttof32(192) ) ) );
+					prevSmallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y-1), inttof32(render::vscreen->Height) ), inttof32(224) ) ) );
 				}
 				else
 				{
-					smallX = f32toint( ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width-380/2) ), inttof32(192) ) ) );
-					smallY = f32toint( ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(256) ) ) );
-					ind = (smallX-328) * 256 + (256-1-smallY);
+					smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width-380/2) ), inttof32(192) ) ) );
+					smallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(256) ) ) );
+					prevSmallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x-1), inttof32(render::vscreen->Width-380/2) ), inttof32(192) ) ) );
+					prevSmallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y-1), inttof32(render::vscreen->Height) ), inttof32(256) ) ) );
 				}
 
 				Rgba color = render::vscreen->BmpBufPtr1[y * render::vscreen->Width + x].rgba;
-				vram_ptr[ind] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
+				for (int finalY = prevSmallY+1; finalY <= smallY; finalY++)
+				{
+					for (int finalX = prevSmallX+1; finalX <= smallX; finalX++)
+					{
+						ind = (vram_ptr == VRAM_A) ?
+							tableStartPos + ((finalX-3) * 256 + (256-1-finalY)) :
+							(finalX-328) * 256 + (256-1-finalY);
+
+						vram_ptr[ind] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
+					}
+				}
 			}
 		}
 	}

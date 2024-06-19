@@ -461,3 +461,14 @@ void maths::find_closest_edge(ramp_plane_type* plane, int planeCount, wall_point
 		++planePtr;
 	}
 }
+
+int maths::floorf32(int x)
+{
+	return inttof32(f32toint(x));
+}
+
+int maths::ceilf32(int x)
+{
+	int floored = floorf32(x);
+	return (floored != x) ? floored+inttof32(1) : x;
+}
