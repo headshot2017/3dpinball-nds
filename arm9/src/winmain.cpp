@@ -13,6 +13,8 @@
 #include "ndsfb_graphics.h"
 #include "nds_input.h"
 
+#include "splash.h"
+
 #include <fat.h>
 
 int winmain::bQuit = 0;
@@ -44,6 +46,13 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	// Initialize graphics and input
 
 	ndsfb_graphics::Initialize();
+	ndsfb_graphics::SetSubScreenConsole(true);
+
+	for (int i = 0; i < splashBitmapLen/2; i++)
+	{
+		int start = (7) * 256 + 0;
+		VRAM_A[start + i] = ((u16*)splashBitmap)[i];
+	}
 
 	if (!fatInitDefault())
 		PrintFatalError("fatInitDefault() failed\nPlease check your SD card.\n");
@@ -111,7 +120,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	pb::firsttime_setup();
 
 	ndsfb_graphics::AskRotationMode();
-	ndsfb_graphics::SetSubScreenConsole(false);
+	//ndsfb_graphics::SetSubScreenConsole(false);
 	ndsfb_graphics::UpdateFull();
 
 	nds_input::Initialize();
