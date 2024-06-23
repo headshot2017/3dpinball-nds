@@ -92,11 +92,8 @@ void gdrv_bitmap8::ScaleIndexed(float scaleX, float scaleY)
 	{
 		for (int x = 0; x < Width; x++)
 		{
-			/*auto px = static_cast<int>(x / scaleX);
-			auto py = static_cast<int>(y / scaleY);
-			newIndBuf[dst] = IndexedBmpPtr[(py * IndexedStride) + px];*/
-			int smallX = (int)(x / (float)Width * (float)newWidht);
-			int smallY = (int)(y / (float)Height * (float)newHeight);
+			int smallX = static_cast<int>(static_cast<float>(x) / Width * newWidht);
+			int smallY = static_cast<int>(static_cast<float>(y) / Height * newHeight);
 			newIndBuf[smallY * newWidht + smallX] = IndexedBmpPtr[(y * IndexedStride) + x];
 		}
 	}
