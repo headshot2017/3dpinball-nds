@@ -29,7 +29,7 @@ void zmap_header_type::Scale(float scaleX, float scaleY)
 	newStride = (newStride >= 0) ? newStride : pad(newWidht);
 
 	auto newZPtr1 = new unsigned short[newHeight * newStride];
-	for (int dst = 0, y = 0; y < Height; y++)
+	for (int y = 0; y < Height; y++)
 	{
 		for (int x = 0; x < Width; x++)
 		{
