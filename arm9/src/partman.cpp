@@ -130,15 +130,21 @@ DatFile* partman::load_records(LPCSTR lpFileName, bool fullTiltMode)
 	fclose(fileHandle);
 	if (datFile->Groups.size() == header.NumberOfGroups)
 	{
-		for (auto groupData : datFile->Groups)
+		for (auto group : datFile->Groups)
 		{
-			for (auto entryData : groupData->GetEntries())
+			for (int i = 0; i <= 2; i++)
 			{
-				if (entryData->EntryType != FieldTypes::Bitmap8bit) continue;
-				gdrv_bitmap8* bmp = reinterpret_cast<gdrv_bitmap8*>(entryData->Buffer);
-				bmp->ScaleIndexed(0.5f, 0.5f);
-				bmp->XPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->XPosition), inttof32(2) ) ) );
-				bmp->YPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->YPosition), inttof32(2) ) ) );
+				auto bmp = group->GetBitmap(i);
+				if (bmp)
+				{
+					bmp->ScaleIndexed(0.5f, 0.5f);
+					bmp->XPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->XPosition), inttof32(2) ) ) );
+					bmp->YPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->YPosition), inttof32(2) ) ) );
+				}
+
+				auto zmap = group->GetZMap(i);
+				if (zmap)
+					zmap->Scale(0.5f, 0.5f);
 			}
 		}
 		datFile->Finalize();

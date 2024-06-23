@@ -8,8 +8,11 @@ struct zmap_header_type
 	int Width;
 	int Height;
 	int Stride;
+	int origStride;
 	unsigned Resolution;
 	uint16_t* ZPtr1;
+
+	void Scale(float scaleX, float scaleY);
 private:
 	static int pad(int width);
 };

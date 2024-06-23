@@ -69,8 +69,8 @@ int pb::init()
 		memcpy(&projMat, cameraInfo, sizeof(float) * 4 * 3);
 		cameraInfo += 12;
 
-		auto projCenterX = resInfo->TableWidth * 0.25f;
-		auto projCenterY = resInfo->TableHeight * 0.25f;
+		auto projCenterX = resInfo->TableWidth * 0.5f;
+		auto projCenterY = resInfo->TableHeight * 0.5f;
 		auto projD = cameraInfo[0];
 		proj::init(projMat, projD, projCenterX, projCenterY);
 		zMin = cameraInfo[1];

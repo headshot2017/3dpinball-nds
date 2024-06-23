@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "zdrv.h"
 #include "winmain.h"
+#include "maths.h"
 
 
 zmap_header_type::zmap_header_type(int width, int height, int stride)
@@ -9,12 +10,46 @@ zmap_header_type::zmap_header_type(int width, int height, int stride)
 	Width = width;
 	Height = height;
 	Stride = stride >= 0 ? stride : pad(width);
+	origStride = stride;
 	ZPtr1 = new unsigned short[Stride * Height];
 }
 
 zmap_header_type::~zmap_header_type()
 {
 	delete[] ZPtr1;
+}
+
+void zmap_header_type::Scale(float scaleX, float scaleY)
+{
+	int newWidht = static_cast<int>(Width * scaleX), newHeight = static_cast<int>(Height * scaleY);
+	if (Width == newWidht && Height == newHeight)
+		return;
+
+	int newStride = static_cast<int>(origStride * scaleX);
+	newStride = (newStride >= 0) ? newStride : pad(newWidht);
+
+	auto newZPtr1 = new unsigned short[newHeight * newStride];
+	for (int dst = 0, y = 0; y < Height; y++)
+	{
+		for (int x = 0; x < Width; x++)
+		{
+			int smallX = (int)(x / (float)Width * (float)newWidht);
+			int smallY = (int)(y / (float)Height * (float)newHeight);
+			newZPtr1[smallY * newStride + smallX] = ZPtr1[(y * Stride) + x];
+			/*auto px = static_cast<int>(x * scaleX);
+			auto py = static_cast<int>(y * scaleY);
+			if (px >= newWidht) px = newWidht-1;
+			if (py >= newHeight) py = newHeight-1;
+			newZPtr1[py * newStride + px] = ZPtr1[(y * Stride) + x];*/
+		}
+	}
+
+	Width = newWidht;
+	Height = newHeight;
+	Stride = newStride;
+
+	delete[] ZPtr1;
+	ZPtr1 = newZPtr1;
 }
 
 int zmap_header_type::pad(int width)
