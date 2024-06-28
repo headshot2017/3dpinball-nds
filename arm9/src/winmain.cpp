@@ -46,8 +46,8 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	// Initialize graphics and input
 
 	ndsfb_graphics::Initialize();
-	ndsfb_graphics::SetSubScreenConsole(true);
 
+	// show splash image centered on screen, offset pos X,Y = 0,7
 	for (int i = 0; i < splashBitmapLen/2; i++)
 	{
 		int start = (7) * 256 + 0;
@@ -120,7 +120,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	pb::firsttime_setup();
 
 	ndsfb_graphics::AskRotationMode();
-	//ndsfb_graphics::SetSubScreenConsole(false);
+	ndsfb_graphics::SetSubScreenConsole(false);
 	ndsfb_graphics::UpdateFull();
 
 	nds_input::Initialize();
