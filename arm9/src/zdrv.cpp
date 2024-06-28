@@ -25,22 +25,18 @@ void zmap_header_type::Scale(float scaleX, float scaleY)
 	if (Width == newWidht && Height == newHeight)
 		return;
 
-	int newStride = static_cast<int>(origStride * scaleX);
-	newStride = (newStride >= 0) ? newStride : pad(newWidht);
+	int newStride = pad(newWidht);
 
 	auto newZPtr1 = new unsigned short[newHeight * newStride];
+	memset(newZPtr1, 0xff, newHeight*newStride*2);
 	for (int y = 0; y < Height; y++)
 	{
-		for (int x = 0; x < Width; x++)
+		int smallY = (int)(y / (float)Height * (float)newHeight);
+
+		for (int x = 0; x < Stride; x++)
 		{
-			int smallX = (int)(x / (float)Width * (float)newWidht);
-			int smallY = (int)(y / (float)Height * (float)newHeight);
+			int smallX = (int)(x / (float)Stride * (float)newStride);
 			newZPtr1[smallY * newStride + smallX] = ZPtr1[(y * Stride) + x];
-			/*auto px = static_cast<int>(x * scaleX);
-			auto py = static_cast<int>(y * scaleY);
-			if (px >= newWidht) px = newWidht-1;
-			if (py >= newHeight) py = newHeight-1;
-			newZPtr1[py * newStride + px] = ZPtr1[(y * Stride) + x];*/
 		}
 	}
 
