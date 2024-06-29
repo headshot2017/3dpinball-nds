@@ -7,6 +7,7 @@
 #include "pb.h"
 #include "proj.h"
 #include "render.h"
+#include "dsi.h"
 #include "TPinballTable.h"
 
 TBall::TBall(TPinballTable* table) : TPinballComponent(table, -1, false)
@@ -69,6 +70,12 @@ void TBall::Repaint()
 	proj::xform_to_2d(&Position, pos2D);
 	auto zDepth = proj::z_distance(&Position);
 
+	if (!dsi::isDSi())
+	{
+		pos2D[0] /= 2;
+		pos2D[1] /= 2;
+	}
+
 	auto zArrPtr = VisualZArray;
 	auto index = 0u;
 	for (; index < ListBitmap->size() - 1; ++index, zArrPtr++)
@@ -81,8 +88,8 @@ void TBall::Repaint()
 		RenderSprite,
 		bmp,
 		zDepth,
-		pos2D[0]/2 - bmp->Width / 2,
-		pos2D[1]/2 - bmp->Height / 2);
+		pos2D[0] - bmp->Width / 2,
+		pos2D[1] - bmp->Height / 2);
 }
 
 void TBall::not_again(TEdgeSegment* edge)

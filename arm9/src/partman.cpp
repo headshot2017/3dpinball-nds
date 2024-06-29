@@ -5,6 +5,7 @@
 #include "GroupData.h"
 #include "zdrv.h"
 #include "maths.h"
+#include "dsi.h"
 
 short partman::_field_size[] =
 {
@@ -130,21 +131,24 @@ DatFile* partman::load_records(LPCSTR lpFileName, bool fullTiltMode)
 	fclose(fileHandle);
 	if (datFile->Groups.size() == header.NumberOfGroups)
 	{
-		for (auto group : datFile->Groups)
+		if (!dsi::isDSi())
 		{
-			for (int i = 0; i <= 2; i++)
+			for (auto group : datFile->Groups)
 			{
-				auto bmp = group->GetBitmap(i);
-				if (bmp)
+				for (int i = 0; i <= 2; i++)
 				{
-					bmp->ScaleIndexed(0.5f, 0.5f);
-					bmp->XPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->XPosition), inttof32(2) ) ) );
-					bmp->YPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->YPosition), inttof32(2) ) ) );
-				}
+					auto bmp = group->GetBitmap(i);
+					if (bmp)
+					{
+						bmp->ScaleIndexed(0.5f, 0.5f);
+						bmp->XPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->XPosition), inttof32(2) ) ) );
+						bmp->YPosition = f32toint( maths::ceilf32(divf32( inttof32(bmp->YPosition), inttof32(2) ) ) );
+					}
 
-				auto zmap = group->GetZMap(i);
-				if (zmap)
-					zmap->Scale(0.5f, 0.5f);
+					auto zmap = group->GetZMap(i);
+					if (zmap)
+						zmap->Scale(0.5f, 0.5f);
+				}
 			}
 		}
 		datFile->Finalize();

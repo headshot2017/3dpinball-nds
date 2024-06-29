@@ -12,6 +12,7 @@
 #include "Sound.h"
 #include "ndsfb_graphics.h"
 #include "nds_input.h"
+#include "dsi.h"
 
 #include "splash.h"
 
@@ -42,6 +43,8 @@ optionsStruct &winmain::Options = options::Options;
 int winmain::WinMain(LPCSTR lpCmdLine)
 {
 	std::set_new_handler(memalloc_failure);
+
+	dsi::init();
 
 	// Initialize graphics and input
 

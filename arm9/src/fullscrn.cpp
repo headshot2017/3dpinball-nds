@@ -30,13 +30,16 @@ int fullscrn::GetResolution()
 
 void fullscrn::SetResolution(int value)
 {
+	// stay at lowest resolution (0) on DS
+	/*
 	if (!pb::FullTiltMode)
 		value = 0;
 	assertm(value >= 0 && value <= 2, "Resolution value out of bounds");
 	resolution = value;
+	*/
 }
 
 int fullscrn::GetMaxResolution()
 {
-	return pb::FullTiltMode ? 2 : 0;
+	return 0;
 }

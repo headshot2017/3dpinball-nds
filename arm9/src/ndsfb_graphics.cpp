@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "maths.h"
 #include "render.h"
+#include "dsi.h"
 
 #include <cstdio>
 #include <cstring>
@@ -107,11 +108,14 @@ void ndsfb_graphics::UpdateFull(bool sub)
 	// Rotated 90° CCW index: (x) * 256 + (256 - 1 - y)
 
 	// Table bitmap
+	int vwidth = 360;
+	if (!dsi::isDSi()) vwidth /= 2;
+
 	for (int y = 0; y < 224; y++)
 	{
 		for (int x = 0; x < 360; x++)
 		{
-			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(360/2) ) );
+			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(vwidth) ) );
 			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(224) ), inttof32(render::vscreen->Height) ) );
 
 			Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
@@ -123,11 +127,13 @@ void ndsfb_graphics::UpdateFull(bool sub)
 	if (!sub) return;
 
 	// Info bitmap
+	vwidth = 380;
+	if (!dsi::isDSi()) vwidth /= 2;
 	for (int y = 0; y < 256; y++)
 	{
 		for (int x = 328; x < 328+192; x++)
 		{
-			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(render::vscreen->Width-380/2) ) );
+			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(render::vscreen->Width-vwidth) ) );
 			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(256) ), inttof32(render::vscreen->Height) ) );
 			u16* vram_ptr = bgGetGfxPtr(bgSubID);
 
@@ -187,6 +193,16 @@ void ndsfb_graphics::UpdateNormalMode()
 
 void ndsfb_graphics::UpdateRotatedMode()
 {
+	int vwidthTable = 360;
+	int vwidthInfo = 380;
+	int xPosCheck = 370;
+	if (!dsi::isDSi())
+	{
+		vwidthTable /= 2;
+		vwidthInfo /= 2;
+		xPosCheck /= 2;
+	}
+
 	for (u32 i=0; i<render::get_dirty_regions().size(); i++)
 	{
 		rectangle_type dirty = render::get_dirty_regions()[i];
@@ -196,20 +212,20 @@ void ndsfb_graphics::UpdateRotatedMode()
 			for (int x = dirty.XPosition; x < dirty.XPosition+dirty.Width; x++)
 			{
 				int smallX, smallY, prevSmallX, prevSmallY, ind;
-				u16* vram_ptr = (dirty.XPosition < 370/2) ? VRAM_A : bgGetGfxPtr(bgSubID);
+				u16* vram_ptr = (dirty.XPosition < xPosCheck) ? VRAM_A : bgGetGfxPtr(bgSubID);
 
 				if (vram_ptr == VRAM_A)
 				{
-					smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(360/2) ), inttof32(192) ) ) );
+					smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(vwidthTable) ), inttof32(192) ) ) );
 					smallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(224) ) ) );
-					prevSmallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x-1), inttof32(360/2) ), inttof32(192) ) ) );
+					prevSmallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x-1), inttof32(vwidthTable) ), inttof32(192) ) ) );
 					prevSmallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y-1), inttof32(render::vscreen->Height) ), inttof32(224) ) ) );
 				}
 				else
 				{
-					smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width-380/2) ), inttof32(192) ) ) );
+					smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width-vwidthInfo) ), inttof32(192) ) ) );
 					smallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(256) ) ) );
-					prevSmallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x-1), inttof32(render::vscreen->Width-380/2) ), inttof32(192) ) ) );
+					prevSmallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x-1), inttof32(render::vscreen->Width-vwidthInfo) ), inttof32(192) ) ) );
 					prevSmallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y-1), inttof32(render::vscreen->Height) ), inttof32(256) ) ) );
 				}
 

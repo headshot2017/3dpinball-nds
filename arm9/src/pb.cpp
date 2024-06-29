@@ -26,6 +26,7 @@
 #include "TPinballTable.h"
 #include "TTextBox.h"
 #include "nds_input.h"
+#include "dsi.h"
 
 TPinballTable* pb::MainTable = nullptr;
 DatFile* pb::record_table = nullptr;
@@ -63,21 +64,28 @@ int pb::init()
 
 	/*Full tilt: table size depends on resolution*/
 	auto resInfo = &fullscrn::resolution_array[fullscrn::GetResolution()];
+	float TableWidth = resInfo->TableWidth;
+	float TableHeight = resInfo->TableHeight;
+	if (!dsi::isDSi())
+	{
+		TableWidth /= 2;
+		TableHeight /= 2;
+	}
 
 	if (cameraInfo)
 	{
 		memcpy(&projMat, cameraInfo, sizeof(float) * 4 * 3);
 		cameraInfo += 12;
 
-		auto projCenterX = resInfo->TableWidth * 0.5f;
-		auto projCenterY = resInfo->TableHeight * 0.5f;
+		auto projCenterX = TableWidth * 0.5f;
+		auto projCenterY = TableHeight * 0.5f;
 		auto projD = cameraInfo[0];
 		proj::init(projMat, projD, projCenterX, projCenterY);
 		zMin = cameraInfo[1];
 		zScaler = cameraInfo[2];
 	}
 
-	render::init(nullptr, zMin, zScaler, resInfo->TableWidth*0.5f, resInfo->TableHeight*0.5f);
+	render::init(nullptr, zMin, zScaler, TableWidth, TableHeight);
 	gdrv::copy_bitmap(
 		render::vscreen,
 		backgroundBmp->Width,
