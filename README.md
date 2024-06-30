@@ -8,5 +8,9 @@ Port of 3D Pinball - Space Cadet to the Nintendo DS, based on the [decompilation
 
 Built with the [BlocksDS SDK](https://github.com/blocksds/sdk)
 
-This port has some bugs which are currently being fixed:
-* Sprites on the pinball table do not appear correctly due to being downscaled by half
+Game data from 3D Pinball Space Cadet (Windows 95 Plus, Windows XP...) must be placed in `SD card/data/SpaceCadetPinball`
+
+This port has some bugs:
+* CADET.DAT from Full Tilt! Pinball does not work. Most likely due to having higher-resolution bitmaps and running out of memory while loading.
+* When loading the game in DS mode, some of the lights on the pinball table do not work correctly as a side effect of the bitmaps being downscaled by half.
+  * This is not present in DSi mode, as the bitmaps are not downscaled there.
