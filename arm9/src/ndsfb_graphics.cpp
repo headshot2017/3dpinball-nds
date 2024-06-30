@@ -4,6 +4,9 @@
 #include "render.h"
 #include "dsi.h"
 
+#include "bg_screenmode.h"
+#include "bg_screenmode2.h"
+
 #include <cstdio>
 #include <cstring>
 #include <malloc.h>
@@ -36,26 +39,25 @@ void ndsfb_graphics::SwapBuffers()
 
 void ndsfb_graphics::AskRotationMode()
 {
-	ndsfb_graphics::SetSubScreenConsole(true);
+	videoSetModeSub(MODE_0_2D);
+	vramSetBankC(VRAM_C_SUB_BG);
+	int bgID = bgInitSub(0, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
+
+	const unsigned* bgTiles[] = {bg_screenmodeTiles, bg_screenmode2Tiles};
+	const u16* bgMap[] = {bg_screenmodeMap, bg_screenmode2Map};
+	const u16* bgPal[] = {bg_screenmodePal, bg_screenmode2Pal};
+	u32 bgTilesLen[] = {bg_screenmodeTilesLen, bg_screenmode2TilesLen};
 
 	bool selected = false;
 	int selection = 0;
-
-	const char* items[2] = {"Normal", "90° rotation CCW"};
-	const char* controls[2] = {
-		"A = Launch ball\nDPad or L/R buttons = Paddles\nY + DPad = Nudge/tilt table\nStart = Pause\nSelect = New game\nStart + Select = Exit",
-		"DPad Up = Launch ball\nDPad Left/Right = Paddles\nL + DPad = Nudge/tilt table\nStart = Pause\nSelect = New game\nStart + Select = Exit",
-	};
 
 	while (!selected)
 	{
 		rotated = (selection == 1);
 
-		consoleClear();
-		printf("Select screen mode with DPad\nPress A to confirm\n\n");
-		for (int i=0; i<2; i++)
-			printf("%s %s\n", (selection == i) ? "->" : "  ", items[i]);
-		printf("\n\n\n%s", controls[selection]);
+		dmaCopy(bgTiles[selection], bgGetGfxPtr(bgID), bgTilesLen[selection]);
+		dmaCopy(bgMap[selection], bgGetMapPtr(bgID), 1536);
+		dmaCopy(bgPal[selection], BG_PALETTE_SUB, 512);
 
 		dmaFillHalfWords(0, VRAM_A, 256*192*2);
 		UpdateFull(false);
@@ -64,12 +66,12 @@ void ndsfb_graphics::AskRotationMode()
 		{
 			scanKeys();
 			int key = keysDown();
-			if (key & KEY_DOWN)
+			if (key & KEY_RIGHT)
 			{
 				selection = (selection+1) % 2;
 				break;
 			}
-			if (key & KEY_UP)
+			if (key & KEY_LEFT)
 			{
 				selection = (selection-1) % 2;
 				if (selection < 0) selection = -selection;
