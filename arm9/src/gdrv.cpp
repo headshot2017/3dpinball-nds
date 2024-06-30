@@ -88,13 +88,14 @@ void gdrv_bitmap8::ScaleIndexed(float scaleX, float scaleY)
 		return;
 
 	auto newIndBuf = new char[newHeight * newWidht];
-	for (int dst=0, y = 0; y < newHeight; y++)
+	for (int y = 0; y < Height; y++)
 	{
-		for (int x = 0; x < newWidht; x++, dst++)
+		int py = (int)(y / (float)Height * (float)newHeight);
+
+		for (int x = 0; x < Width; x++)
 		{
-			auto px = static_cast<int>(x / scaleX);
-			auto py = static_cast<int>(y / scaleY);
-			newIndBuf[dst] = IndexedBmpPtr[(py * IndexedStride) + px];
+			int px = (int)(x / (float)Width * (float)newWidht);
+			newIndBuf[py*newWidht+px] = IndexedBmpPtr[(y * IndexedStride) + x];
 		}
 	}
 
