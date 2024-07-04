@@ -190,6 +190,8 @@ void ndsfb_graphics::UpdateNormalMode()
 			{
 				int px = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
 				int py = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
+				if (px >= render::vscreen->Width) px = render::vscreen->Width-1;
+				if (py >= render::vscreen->Height) px = render::vscreen->Height-1;
 
 				Rgba color = render::vscreen->BmpBufPtr1[py * render::vscreen->Width + px].rgba;
 				VRAM_A[y * 256 + x] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
@@ -240,6 +242,8 @@ void ndsfb_graphics::UpdateRotatedMode()
 				{
 					px = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(vwidthTable) ) );
 					py = f32toint( mulf32( divf32( inttof32(y), inttof32(224) ), inttof32(render::vscreen->Height) ) );
+					if (px >= vwidthTable) px = vwidthTable-1;
+					if (py >= render::vscreen->Height) py = render::vscreen->Height-1;
 				}
 				else
 				{
