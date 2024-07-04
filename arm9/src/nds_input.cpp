@@ -11,10 +11,10 @@ void nds_input::Initialize()
 {
 	if (!ndsfb_graphics::isRotated())
 	{
-		nudgeKey = KEY_Y;
-		launchKey = KEY_A;
-		leftKey = KEY_LEFT | KEY_L;
-		rightKey = KEY_RIGHT | KEY_R;
+		nudgeKey = KEY_X;
+		launchKey = KEY_DOWN | KEY_B;
+		leftKey = KEY_LEFT | KEY_Y | KEY_L;
+		rightKey = KEY_RIGHT | KEY_A | KEY_R;
 		upKey = KEY_UP;
 	}
 	else
