@@ -2,9 +2,7 @@
 
 Port of 3D Pinball - Space Cadet to the Nintendo DS, based on the [decompilation project](https://github.com/k4zmu2a/SpaceCadetPinball)
 
-![image](screenshot1_new.png)
-![image](screenshot2_new.png)
-![image](screenshot3_new.png)
+![image](screenshot_.png)
 
 Built with the [BlocksDS SDK](https://github.com/blocksds/sdk)
 
