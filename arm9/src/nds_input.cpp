@@ -20,7 +20,7 @@ void nds_input::Initialize()
 	else
 	{
 		nudgeKey = KEY_L;
-		launchKey = KEY_RIGHT;
+		launchKey = KEY_LEFT;
 		leftKey = KEY_UP;
 		rightKey = KEY_DOWN;
 		upKey = KEY_RIGHT;
