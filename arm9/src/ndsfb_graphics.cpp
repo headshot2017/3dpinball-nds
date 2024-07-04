@@ -97,10 +97,10 @@ void ndsfb_graphics::UpdateFull(bool sub)
 		{
 			for (int x = 0; x < 256; x++)
 			{
-				int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
-				int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
+				int px = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
+				int py = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
 
-				Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
+				Rgba color = render::vscreen->BmpBufPtr1[py * render::vscreen->Width + px].rgba;
 				VRAM_A[y * 256 + x] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
 			}
 		}
@@ -117,10 +117,10 @@ void ndsfb_graphics::UpdateFull(bool sub)
 	{
 		for (int x = 0; x < 360; x++)
 		{
-			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(vwidth) ) );
-			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(224) ), inttof32(render::vscreen->Height) ) );
+			int px = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(vwidth) ) );
+			int py = f32toint( mulf32( divf32( inttof32(y), inttof32(224) ), inttof32(render::vscreen->Height) ) );
 
-			Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
+			Rgba color = render::vscreen->BmpBufPtr1[py * render::vscreen->Width + px].rgba;
 			int ind = tableStartPos + ((x-3) * 256 + (256-1-y));
 			VRAM_A[ind] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
 		}
@@ -135,11 +135,11 @@ void ndsfb_graphics::UpdateFull(bool sub)
 	{
 		for (int x = 328; x < 328+192; x++)
 		{
-			int smallX = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(render::vscreen->Width-vwidth) ) );
-			int smallY = f32toint( mulf32( divf32( inttof32(y), inttof32(256) ), inttof32(render::vscreen->Height) ) );
+			int px = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(render::vscreen->Width-vwidth) ) );
+			int py = f32toint( mulf32( divf32( inttof32(y), inttof32(256) ), inttof32(render::vscreen->Height) ) );
 			u16* vram_ptr = bgGetGfxPtr(bgSubID);
 
-			Rgba color = render::vscreen->BmpBufPtr1[smallY * render::vscreen->Width + smallX].rgba;
+			Rgba color = render::vscreen->BmpBufPtr1[py * render::vscreen->Width + px].rgba;
 			int ind = (x-328) * 256 + (256-1-y);
 			vram_ptr[ind] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
 		}
@@ -179,15 +179,20 @@ void ndsfb_graphics::UpdateNormalMode()
 	{
 		rectangle_type dirty = render::get_dirty_regions()[i];
 
+		dirty.XPosition = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.XPosition), inttof32(render::vscreen->Width) ), inttof32(256) ) ) )-1;
+		dirty.YPosition = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.YPosition), inttof32(render::vscreen->Height) ), inttof32(192) ) ) )-1;
+		dirty.Width = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.Width), inttof32(render::vscreen->Width) ), inttof32(256) ) ) )+1;
+		dirty.Height = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.Height), inttof32(render::vscreen->Height) ), inttof32(192) ) ) )+1;
+
 		for (int y = dirty.YPosition; y < dirty.YPosition+dirty.Height; y++)
 		{
 			for (int x = dirty.XPosition; x < dirty.XPosition+dirty.Width; x++)
 			{
-				int smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width) ), inttof32(256) ) ) );
-				int smallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(192) ) ) );
+				int px = f32toint( mulf32( divf32( inttof32(x), inttof32(256) ), inttof32(render::vscreen->Width) ) );
+				int py = f32toint( mulf32( divf32( inttof32(y), inttof32(192) ), inttof32(render::vscreen->Height) ) );
 
-				Rgba color = render::vscreen->BmpBufPtr1[y * render::vscreen->Width + x].rgba;
-				VRAM_A[smallY * 256 + (smallX)] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
+				Rgba color = render::vscreen->BmpBufPtr1[py * render::vscreen->Width + px].rgba;
+				VRAM_A[y * 256 + x] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
 			}
 		}
 	}
@@ -208,41 +213,46 @@ void ndsfb_graphics::UpdateRotatedMode()
 	for (u32 i=0; i<render::get_dirty_regions().size(); i++)
 	{
 		rectangle_type dirty = render::get_dirty_regions()[i];
+		u16* vram_ptr = (dirty.XPosition < xPosCheck) ? VRAM_A : bgGetGfxPtr(bgSubID);
+
+		if (vram_ptr == VRAM_A)
+		{
+			dirty.XPosition = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.XPosition), inttof32(vwidthTable) ), inttof32(192) ) ) )-1;
+			dirty.YPosition = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.YPosition), inttof32(render::vscreen->Height) ), inttof32(224) ) ) )-1;
+			dirty.Width = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.Width), inttof32(vwidthTable) ), inttof32(192) ) ) )+1;
+			dirty.Height = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.Height), inttof32(render::vscreen->Height) ), inttof32(224) ) ) )+1;
+		}
+		else
+		{
+			dirty.XPosition = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.XPosition), inttof32(render::vscreen->Width-vwidthInfo) ), inttof32(192) ) ) )-1;
+			dirty.YPosition = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.YPosition), inttof32(render::vscreen->Height) ), inttof32(256) ) ) )-1;
+			dirty.Width = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.Width), inttof32(render::vscreen->Width-vwidthInfo) ), inttof32(192) ) ) )+1;
+			dirty.Height = f32toint( maths::ceilf32(mulf32( divf32( inttof32(dirty.Height), inttof32(render::vscreen->Height) ), inttof32(256) ) ) )+1;
+		}
 
 		for (int y = dirty.YPosition; y < dirty.YPosition+dirty.Height; y++)
 		{
 			for (int x = dirty.XPosition; x < dirty.XPosition+dirty.Width; x++)
 			{
-				int smallX, smallY, prevSmallX, prevSmallY, ind;
-				u16* vram_ptr = (dirty.XPosition < xPosCheck) ? VRAM_A : bgGetGfxPtr(bgSubID);
+				int px, py, ind;
 
 				if (vram_ptr == VRAM_A)
 				{
-					smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(vwidthTable) ), inttof32(192) ) ) );
-					smallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(224) ) ) );
-					prevSmallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x-1), inttof32(vwidthTable) ), inttof32(192) ) ) );
-					prevSmallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y-1), inttof32(render::vscreen->Height) ), inttof32(224) ) ) );
+					px = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(vwidthTable) ) );
+					py = f32toint( mulf32( divf32( inttof32(y), inttof32(224) ), inttof32(render::vscreen->Height) ) );
 				}
 				else
 				{
-					smallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x), inttof32(render::vscreen->Width-vwidthInfo) ), inttof32(192) ) ) );
-					smallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y), inttof32(render::vscreen->Height) ), inttof32(256) ) ) );
-					prevSmallX = f32toint( maths::ceilf32(mulf32( divf32( inttof32(x-1), inttof32(render::vscreen->Width-vwidthInfo) ), inttof32(192) ) ) );
-					prevSmallY = f32toint( maths::ceilf32(mulf32( divf32( inttof32(y-1), inttof32(render::vscreen->Height) ), inttof32(256) ) ) );
+					px = f32toint( mulf32( divf32( inttof32(x), inttof32(192) ), inttof32(render::vscreen->Width-vwidthInfo) ) );
+					py = f32toint( mulf32( divf32( inttof32(y), inttof32(256) ), inttof32(render::vscreen->Height) ) );
 				}
 
-				Rgba color = render::vscreen->BmpBufPtr1[y * render::vscreen->Width + x].rgba;
-				for (int finalY = prevSmallY+1; finalY <= smallY; finalY++)
-				{
-					for (int finalX = prevSmallX+1; finalX <= smallX; finalX++)
-					{
-						ind = (vram_ptr == VRAM_A) ?
-							tableStartPos + ((finalX-3) * 256 + (256-1-finalY)) :
-							(finalX-328) * 256 + (256-1-finalY);
+				Rgba color = render::vscreen->BmpBufPtr1[py * render::vscreen->Width + px].rgba;
 
-						vram_ptr[ind] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
-					}
-				}
+				ind = (vram_ptr == VRAM_A) ?
+					tableStartPos + ((x-3) * 256 + (256-1-y)) :
+					(x-328) * 256 + (256-1-y);
+				vram_ptr[ind] = (!color.Alpha) ? 0 : ARGB16(1, color.Blue>>3, color.Green>>3, color.Red>>3);
 			}
 		}
 	}
