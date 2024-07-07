@@ -63,8 +63,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	if (!fatInitDefault())
 		PrintFatalError("fatInitDefault() failed\nPlease check your SD card.\n");
 
-	if (!nitroFSInit(0))
-		PrintFatalError("nitroFSInit() failed\nMusic will not be available.");
+	nitroFSInit(0);
 
 	// Set the base path for PINBALL.DAT
 
