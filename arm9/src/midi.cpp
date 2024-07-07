@@ -82,7 +82,7 @@ void midi::music_shutdown()
 {
 	mp3_stop();
 
-	if (active_track)
+	//if (active_track)
 		//Mix_HaltMusic();
 
 	for (auto midi : LoadedTracks)
