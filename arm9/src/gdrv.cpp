@@ -112,7 +112,7 @@ int gdrv::display_palette(ColorRgba* plt)
 {
 	const uint32_t sysPaletteColors[]
 	{
-		0x000000ff, // Color 0: transparent
+		0x00000000, // Color 0: transparent
 		0x800000ff,
 		0x008000ff,
 		0x808000ff,
