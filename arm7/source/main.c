@@ -7,9 +7,11 @@
 
 // Default ARM7 core
 
-#include <dswifi7.h>
+//#include <dswifi7.h>
 #include <nds.h>
 //#include <maxmod7.h>
+
+#include "mp3_shared.h"
 
 volatile bool exit_loop = false;
 
@@ -21,7 +23,7 @@ void power_button_callback(void)
 void vblank_handler(void)
 {
     inputGetAndSend();
-    Wifi_Update();
+    //Wifi_Update();
 }
 
 int main(int argc, char *argv[])
@@ -45,7 +47,7 @@ int main(int argc, char *argv[])
 
     fifoInit();
 
-    installWifiFIFO();
+    //installWifiFIFO();
     installSoundFIFO();
     installSystemFIFO(); // Sleep mode, storage, firmware...
 
@@ -64,8 +66,12 @@ int main(int argc, char *argv[])
 
     irqEnable(IRQ_VBLANK);
 
+	mp3_init();
+
     while (!exit_loop)
     {
+		mp3_process();
+
         const uint16_t key_mask = KEY_SELECT | KEY_START | KEY_L | KEY_R;
         uint16_t keys_pressed = ~REG_KEYINPUT;
 

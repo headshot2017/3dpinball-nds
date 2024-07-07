@@ -27,7 +27,7 @@ public:
 	static bool LaunchBallEnabled;
 	static bool HighScoresEnabled;
 	static bool DemoActive;
-	static char *BasePath;
+	static std::string BasePath;
 
 	static int WinMain(LPCSTR lpCmdLine);
 	static void memalloc_failure();

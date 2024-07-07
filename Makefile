@@ -26,7 +26,7 @@ SDIMAGE		:= image.bin
 # Source code paths
 # -----------------
 
-NITROFSDIR	?=
+NITROFSDIR	?= nitro
 
 # Tools
 # -----

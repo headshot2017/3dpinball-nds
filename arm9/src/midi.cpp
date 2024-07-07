@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "midi.h"
 
+#include "mp3_shared.h"
 
 #include "pb.h"
 #include "pinball.h"
+#include "winmain.h"
 
 
 std::vector<void*> midi::LoadedTracks{};
@@ -43,6 +45,8 @@ int midi::music_stop()
 		active_track = nullptr;
 	}
 
+	mp3_stop();
+
 	return true;
 }
 
@@ -50,6 +54,10 @@ int midi::music_init()
 {
 	active_track = nullptr;
 
+	mp3_init();
+	return true;
+
+	/*
 	if (pb::FullTiltMode)
 	{
 		track1 = load_track("TABA1");
@@ -67,10 +75,13 @@ int midi::music_init()
 	if (!track3)
 		track3 = track1;
 	return track1 != nullptr;
+	*/
 }
 
 void midi::music_shutdown()
 {
+	mp3_stop();
+
 	if (active_track)
 		//Mix_HaltMusic();
 
@@ -122,6 +133,11 @@ void* midi::load_track(std::string fileName)
 bool midi::play_track(void* midi)
 {
 	music_stop();
+	if (midi == track1)
+	{
+		return mp3_play("nitro:/PINBALL.mp3", true);
+	}
+
 	if (!midi)
 		return false;
 
@@ -132,7 +148,7 @@ bool midi::play_track(void* midi)
 		return true;
 	}
 
-    /*
+	/*
 	if (Mix_PlayMusic(midi, -1))
 	{
 		active_track = nullptr;

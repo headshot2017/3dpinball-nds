@@ -11,8 +11,8 @@ ARM_NONE_EABI_PATH	?= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/
 # Source code paths
 # -----------------
 
-SOURCEDIRS	?= arm7/source
-INCLUDEDIRS	?= 
+SOURCEDIRS	?= common/helix arm7/source
+INCLUDEDIRS	?= common common/helix common/helix/real
 BINDIRS		?=
 
 # Defines passed to all files
@@ -23,9 +23,8 @@ DEFINES		?=
 # Libraries
 # ---------
 
-LIBS		?= -ldswifi7 -lnds7
-LIBDIRS		+= $(BLOCKSDS)/libs/libnds \
-			   $(BLOCKSDS)/libs/dswifi
+LIBS		?= -lnds7
+LIBDIRS		+= $(BLOCKSDS)/libs/libnds
 
 # Build artifacts
 # -----------------
