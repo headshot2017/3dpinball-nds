@@ -68,7 +68,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 
 	// Set the base path for PINBALL.DAT
 
-	char* dir = fatGetDefaultCwd();
+	const char* dir = fatGetDefaultDrive();
 	if (dir)
 	{
 		BasePath = dir;
