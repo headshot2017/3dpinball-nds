@@ -5,7 +5,7 @@
 class ndsfb_graphics
 {
     static bool isConsoleInitialized;
-	static bool rotated;
+	static int rotation;
 	static int bgMainID;
 	static int bgSubID;
 
@@ -14,7 +14,7 @@ public:
     static void SwapBuffers();
 
 	static void AskRotationMode();
-	static bool isRotated() {return rotated;}
+	static int getRotation() {return rotation;}
 
 	static void UpdateFull(bool sub=true);
 	static void Update();
@@ -24,4 +24,5 @@ public:
 private:
 	static void UpdateNormalMode();
 	static void UpdateRotatedMode();
+	static void UpdateInvRotatedMode();
 };

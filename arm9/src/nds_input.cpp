@@ -9,21 +9,31 @@ static u32 nudgeKey, launchKey, leftKey, rightKey, upKey;
 
 void nds_input::Initialize()
 {
-	if (!ndsfb_graphics::isRotated())
+	switch (ndsfb_graphics::getRotation())
 	{
-		nudgeKey = KEY_X;
-		launchKey = KEY_DOWN | KEY_B;
-		leftKey = KEY_LEFT | KEY_Y | KEY_L;
-		rightKey = KEY_RIGHT | KEY_A | KEY_R;
-		upKey = KEY_UP;
-	}
-	else
-	{
-		nudgeKey = KEY_L;
-		launchKey = KEY_LEFT;
-		leftKey = KEY_UP;
-		rightKey = KEY_DOWN;
-		upKey = KEY_RIGHT;
+		case 0: // default
+			nudgeKey = KEY_X;
+			launchKey = KEY_DOWN | KEY_B;
+			leftKey = KEY_LEFT | KEY_Y | KEY_L;
+			rightKey = KEY_RIGHT | KEY_A | KEY_R;
+			upKey = KEY_UP;
+			break;
+
+		case 1: // portrait (90° CCW)
+			nudgeKey = KEY_L;
+			launchKey = KEY_LEFT;
+			leftKey = KEY_UP;
+			rightKey = KEY_DOWN;
+			upKey = KEY_RIGHT;
+			break;
+
+		case 2: // inverted portrait (90° CW)
+			nudgeKey = KEY_R;
+			launchKey = KEY_A;
+			leftKey = KEY_B;
+			rightKey = KEY_X;
+			upKey = KEY_Y;
+			break;
 	}
 }
 
